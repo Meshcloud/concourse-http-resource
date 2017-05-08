@@ -13,6 +13,19 @@ def test_check(httpbin):
 
     assert output == [{'version': '9'}]
 
+def test_check_with_capture_group(httpbin):
+    """Test if check just uses the first capture group from a regex
+     (no need for named capture groups)."""
+
+    source = {
+        'index': httpbin + '/links/10',
+        'regex': "href='/links/10/([0-9]+)'",
+    }
+
+    output = cmd('check', source)
+
+    assert output == [{'version': '9'}]
+
 def test_check_with_version(httpbin):
     """Test if check returns newer version numbers."""
 

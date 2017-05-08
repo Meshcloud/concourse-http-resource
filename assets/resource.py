@@ -49,7 +49,7 @@ class HTTPResource:
     def in_cmd(self, target_dir, source, version):
         """Download specific version to target_dir."""
 
-        uri = source['uri']
+        uri = source['uri_template']
         file_name = source.get('filename')
         ssl_verify = source.get('ssl_verify', True)
 

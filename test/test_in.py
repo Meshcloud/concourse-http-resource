@@ -5,7 +5,7 @@ def test_in(httpbin, tmpdir):
     """Test downloading versioned file."""
 
     source = {
-        'uri': httpbin + '/range/{version}',
+        'uri_template': httpbin + '/range/{version}',
     }
 
     in_dir = tmpdir.mkdir('work_dir')
@@ -25,7 +25,7 @@ def test_in_filename(httpbin, tmpdir):
     """Test downloading versioned file with predetermined filename."""
 
     source = {
-        'uri': httpbin + '/range/{version}',
+        'uri_template': httpbin + '/range/{version}',
         'filename': 'filename_{version}',
     }
 
