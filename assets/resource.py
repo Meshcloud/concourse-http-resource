@@ -130,4 +130,5 @@ class HTTPResource:
 
         return json.dumps(response)
 
+
 print(HTTPResource().run(os.path.basename(__file__), sys.stdin.read(), sys.argv[1:]))
