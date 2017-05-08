@@ -93,6 +93,42 @@ class HTTPResource:
             'version': version,
             'metadata': metadata,
         }
+   
+    def out_cmd(self, src_dir, source, version, params):
+        """Upload a specific file from src_dir."""
+        
+        uri = source['uri_template']
+        file_name = params.get('file')
+        ssl_verify = source.get('ssl_verify', True)
+
+        if isinstance(ssl_verify, bool):
+            verify = ssl_verify
+        elif isinstance(ssl_verify, str):
+            verify = str(tempfile.NamedTemporaryFile(delete=False, prefix='ssl-').write(verify))
+
+        if not version:
+            version = { 'version': os.path.basename(file_name) }
+
+        # insert version number into URI
+        uri = uri.format(**version)
+
+        metadata = []
+        file_path = os.path.join(src_dir, file_name)
+        with open(file_path, 'rb') as infile:
+            response = requests.put(uri, data=infile, stream=True, verify=verify)
+            response.raise_for_status()
+        
+            # add all response headers to metadata
+            for header, value in response.headers.items():
+                metadata.append({'name': header, 'value': value})
+
+            # add url to metadata
+            metadata.append({'name': 'url', 'value': uri})
+
+        return {
+            'version': version,
+            'metadata': metadata,
+        }
 
     def run(self, command_name, json_data, command_argument):
         """Parse input/arguments, perform requested command return output."""
@@ -120,11 +156,14 @@ class HTTPResource:
         # combine source and params
         source = data.get('source', {})
         version = data.get('version', {})
-
+        params = data.get('params', {})
+        
         if command_name == 'check':
             response = self.check(source, version)
         elif command_name == 'in':
             response = self.in_cmd(command_argument[0], source, version)
+        elif command_name == 'out':
+            response = self.out_cmd(command_argument[0], source, version, params)
         else:
             response = {}
 
