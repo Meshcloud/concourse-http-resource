@@ -14,12 +14,14 @@ def test_in(httpbin, tmpdir):
 
     assert output['version'] == {'version': '9'}
     assert {'name': 'url', 'value': httpbin + '/range/9'} in output['metadata']
-    assert {'name': 'Content-Type', 'value': 'application/octet-stream'} in output['metadata']
+    assert {'name': 'Content-Type',
+            'value': 'application/octet-stream'} in output['metadata']
 
     assert in_dir.join('9').exists()
     assert len(in_dir.join('9').read()) == 9
     assert in_dir.join('version').exists()
     assert in_dir.join('version').read() == '9'
+
 
 def test_in_filename(httpbin, tmpdir):
     """Test downloading versioned file with predetermined filename."""
@@ -35,8 +37,8 @@ def test_in_filename(httpbin, tmpdir):
 
     assert output['version'] == {'version': '9'}
     assert {'name': 'url', 'value': httpbin + '/range/9'} in output['metadata']
-    assert {'name': 'Content-Type', 'value': 'application/octet-stream'} in output['metadata']
+    assert {'name': 'Content-Type',
+            'value': 'application/octet-stream'} in output['metadata']
 
     assert in_dir.join('filename_9').exists()
     assert len(in_dir.join('filename_9').read()) == 9
-

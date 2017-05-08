@@ -19,4 +19,3 @@ def test_out(httpbin, tmpdir):
 
     assert output['version'] == {'version': '9.txt'}
     assert {'name': 'url', 'value': httpbin + '/put'} in output['metadata']
-
