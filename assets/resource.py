@@ -3,6 +3,7 @@
 import json
 import logging as log
 import os
+import glob
 import re
 import sys
 import tempfile
@@ -14,18 +15,22 @@ import requests
 class HTTPResource:
     """HTTP resource implementation."""
 
+    def should_verify_ssl(self, source):
+        """Parses the ssl_verify setting from source"""
+        ssl_verify = source.get('ssl_verify', True)
+
+        if isinstance(ssl_verify, bool):
+            return ssl_verify
+        elif isinstance(ssl_verify, str):
+            return str(tempfile.NamedTemporaryFile(
+                delete=False, prefix='ssl-').write(verify))
+
     def check(self, source, version):
         """Check for new version(s)."""
 
         index = source['index']
         regex = re.compile(source['regex'])
-        ssl_verify = source.get('ssl_verify', True)
-
-        if isinstance(ssl_verify, bool):
-            verify = ssl_verify
-        elif isinstance(ssl_verify, str):
-            verify = str(tempfile.NamedTemporaryFile(
-                delete=False, prefix='ssl-').write(verify))
+        verify = self.should_verify_ssl(source)
 
         # request index and extract versions
         response = requests.request('GET', index, verify=verify)
@@ -52,13 +57,7 @@ class HTTPResource:
 
         uri = source['uri_template']
         file_name = source.get('filename')
-        ssl_verify = source.get('ssl_verify', True)
-
-        if isinstance(ssl_verify, bool):
-            verify = ssl_verify
-        elif isinstance(ssl_verify, str):
-            verify = str(tempfile.NamedTemporaryFile(
-                delete=False, prefix='ssl-').write(verify))
+        verify = self.should_verify_ssl(source)
 
         # insert version number into URI
         uri = uri.format(**version)
@@ -101,22 +100,25 @@ class HTTPResource:
 
         uri = source['uri_template']
         file_name = params.get('file')
-        ssl_verify = source.get('ssl_verify', True)
+        verify = self.should_verify_ssl(source)
 
-        if isinstance(ssl_verify, bool):
-            verify = ssl_verify
-        elif isinstance(ssl_verify, str):
-            verify = str(tempfile.NamedTemporaryFile(
-                delete=False, prefix='ssl-').write(verify))
-
+        file_path = os.path.join(src_dir, file_name)
+        
+        # unless an exact version is specified, expand file_name glob
         if not version:
-            version = {'version': os.path.basename(file_name)}
-
+            matched = glob.glob(file_path)
+            if len(matched) != 1:
+                raise Exception('Not exactly one file matched the glob pattern {0}. Matched files: {1}'.format(
+                    file_name, matched))
+            
+            file_path = matched[0]
+            version = {'version': os.path.basename(file_path)}
+        
         # insert version number into URI
         uri = uri.format(**version)
 
         metadata = []
-        file_path = os.path.join(src_dir, file_name)
+        
         with open(file_path, 'rb') as infile:
             response = requests.put(
                 uri, data=infile, stream=True, verify=verify)

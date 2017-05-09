@@ -35,7 +35,14 @@ Places the following files in the destination:
 
 ### `out`: Upload an object to the bucket.
 
-*Not implemented.*
+Given a file specified by `file`, upload it to the uri at `uri_template`. Upload has two modes 
+
+Parameters
+
+file: Required. Path to the file to upload, provided by an output of a task. If multiple files are matched by the glob, an error is raised. The file which matches will be PUT via HTTP to the `template_uri`. The matching syntax is bash glob expansion, so no capture groups, etc.
+
+version: *Optional.* The version to put into `uri_template when uploading. If not specified, the matched file name will be used instead.
+
 
 ## Developing
 Run `make test` to ensure the resource works. The tests depend on https://httpbin.org/ to generate sample http responses. 
