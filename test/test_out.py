@@ -34,7 +34,7 @@ def test_out_with_glob(httpbin, tmpdir):
 
     out_dir = tmpdir.mkdir('work_dir')
     write_testfile(out_dir, '9.txt')
- 
+
     output = cmd('out', source, [str(out_dir)], {}, {'file': '*.txt'})
 
     assert output['version'] == {'version': '9.txt'}
@@ -58,4 +58,4 @@ def test_out_glob_multimatch(httpbin, tmpdir):
     except Exception:
         raised = True
 
-    assert raised == True
+    assert raised is True

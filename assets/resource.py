@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
+import glob
 import json
 import logging as log
 import os
-import glob
 import re
 import sys
 import tempfile
@@ -20,10 +20,13 @@ class HTTPResource:
         ssl_verify = source.get('ssl_verify', True)
 
         if isinstance(ssl_verify, bool):
-            return ssl_verify
+            verify = ssl_verify
         elif isinstance(ssl_verify, str):
-            return str(tempfile.NamedTemporaryFile(
+            # todo: this looks wrong, but I'm no python expert
+            verify = str(tempfile.NamedTemporaryFile(
                 delete=False, prefix='ssl-').write(verify))
+
+        return verify
 
     def check(self, source, version):
         """Check for new version(s)."""
@@ -103,22 +106,22 @@ class HTTPResource:
         verify = self.should_verify_ssl(source)
 
         file_path = os.path.join(src_dir, file_name)
-        
+
         # unless an exact version is specified, expand file_name glob
         if not version:
             matched = glob.glob(file_path)
             if len(matched) != 1:
                 raise Exception('Not exactly one file matched the glob pattern {0}. Matched files: {1}'.format(
                     file_name, matched))
-            
+
             file_path = matched[0]
             version = {'version': os.path.basename(file_path)}
-        
+
         # insert version number into URI
         uri = uri.format(**version)
 
         metadata = []
-        
+
         with open(file_path, 'rb') as infile:
             response = requests.put(
                 uri, data=infile, stream=True, verify=verify)
