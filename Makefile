@@ -1,4 +1,4 @@
-user=aequitas
+user=johannesrudolph
 name=http-resource
 
 docker=docker
