@@ -77,7 +77,6 @@ class HTTPResource:
 
         with open(file_path, 'wb') as f:
             for block in response.iter_content(1024):
-                print('.', end='', file=sys.stderr)
                 f.write(block)
             print()
 
