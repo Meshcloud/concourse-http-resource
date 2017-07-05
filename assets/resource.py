@@ -16,7 +16,7 @@ class HTTPResource:
     """HTTP resource implementation."""
 
     def should_verify_ssl(self, source):
-        """Parses the ssl_verify setting from source"""
+        """Parse the ssl_verify setting from source."""
         ssl_verify = source.get('ssl_verify', True)
 
         if isinstance(ssl_verify, bool):

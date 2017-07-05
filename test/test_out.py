@@ -1,8 +1,10 @@
 import os
+
 from helpers import cmd
 
 
 def write_testfile(out_dir, name):
+    """Write a file."""
     file_path = os.path.join(out_dir, name)
     with open(file_path, 'w') as out_file:
         out_file.write(name)

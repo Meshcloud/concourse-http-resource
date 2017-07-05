@@ -14,8 +14,7 @@ def test_check(httpbin):
     assert output == [{'version': '9'}]
 
 def test_check_with_capture_group(httpbin):
-    """Test if check just uses the first capture group from a regex
-     (no need for named capture groups)."""
+    """Test if check just uses the first capture group from a regex (no need for named capture groups)."""
 
     source = {
         'index': httpbin + '/links/10',
